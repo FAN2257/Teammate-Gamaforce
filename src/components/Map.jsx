@@ -7,18 +7,41 @@ import "leaflet-draw";
 function Map() {
   useEffect(() => {
     var map = L.map("map").setView([-7.770400, 110.377834], 19);
-    L.tileLayer('http://{s}.tile.osm.org/{z}/{x}/{y}.png', {
+    
+    var osm = L.tileLayer('http://{s}.tile.osm.org/{z}/{x}/{y}.png', {
       attribution: '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
-    }).addTo(map);
-
-    var drawnItems = new L.FeatureGroup();
-    map.addLayer(drawnItems);
-    var drawControl = new L.Control.Draw({
-      edit: {
-        featureGroup: drawnItems
-      }
     });
-    map.addControl(drawControl);
+    
+    osm.addTo(map);
+
+    var drawnItems = L.featureGroup().addTo(map);
+    L.control.layers({
+        'osm': osm.addTo(map),
+        "google": L.tileLayer('http://www.google.cn/maps/vt?lyrs=s@189&gl=cn&x={x}&y={y}&z={z}', {
+            attribution: 'google'
+        })
+    }, { 'drawlayer': drawnItems }, { position: 'topleft', collapsed: false }).addTo(map);
+    map.addControl(new L.Control.Draw({
+        edit: {
+            featureGroup: drawnItems,
+            poly: {
+                allowIntersection: false
+            }
+        },
+        draw: {
+            polygon: {
+                allowIntersection: false,
+                showArea: true
+            }
+        }
+    }));
+
+    map.on(L.Draw.Event.CREATED, function (event) {
+      var layer = event.layer;
+
+      drawnItems.addLayer(layer);
+    });
+
 
     return () => {
       map.remove();
