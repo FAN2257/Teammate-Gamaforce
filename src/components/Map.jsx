@@ -1,51 +1,35 @@
-import React, { useEffect, useRef } from "react";
+import React, { useEffect } from "react";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 import "leaflet-draw/dist/leaflet.draw.css";
 import "leaflet-draw";
 
 function Map() {
-  const mapContainer = useRef(null);
-  const featureGroupRef = useRef(L.featureGroup());
-  const mapRef = useRef(null);
-
   useEffect(() => {
-    if (!mapRef.current) {
-      const map = L.map(mapContainer.current).setView([51.505, -0.09], 13);
+    var map = L.map("map").setView([-7.770400, 110.377834], 19);
+    L.tileLayer('http://{s}.tile.osm.org/{z}/{x}/{y}.png', {
+      attribution: '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
+    }).addTo(map);
 
-      L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
-        attribution: "© OpenStreetMap contributors",
-      }).addTo(map);
-
-      const drawControl = new L.Control.Draw({
-        draw: {
-          polygon: true,
-          polyline: true,
-          rectangle: true,
-          circle: true,
-          marker: true,
-        },
-        edit: {
-          featureGroup: featureGroupRef.current,
-          remove: true,
-        },
-      });
-
-      map.addControl(drawControl);
-
-      mapRef.current = map;
-    }
+    var drawnItems = new L.FeatureGroup();
+    map.addLayer(drawnItems);
+    var drawControl = new L.Control.Draw({
+      edit: {
+        featureGroup: drawnItems
+      }
+    });
+    map.addControl(drawControl);
 
     return () => {
-      if (mapRef.current) {
-        // Clean up when the component is unmounted
-        mapRef.current.remove();
-        mapRef.current = null;
-      }
+      map.remove();
     };
-  }, []); // Empty dependency array to run the effect only once
+  }, []);
 
-  return <div ref={mapContainer} style={{ height: "100vh" }}></div>;
+  return (
+    <div>
+      <div id="map" style={{ height: "100vh" }}></div>
+    </div>
+  );
 }
 
 export default Map;
