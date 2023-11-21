@@ -14,6 +14,7 @@ function Map() {
     
     osm.addTo(map);
 
+    //GMaps, Leaflet draw
     var drawnItems = L.featureGroup().addTo(map);
     L.control.layers({
         'osm': osm.addTo(map),
@@ -36,6 +37,19 @@ function Map() {
         }
     }));
 
+    //Click untuk menampilkan koordinat
+    var popup = L.popup();
+
+    function onMapClick(e) {
+      popup
+        .setLatLng(e.latlng)
+        .setContent(`You clicked the map at ${e.latlng.toString()}`)
+        .openOn(map);
+    }
+
+    map.on('click', onMapClick);
+
+
     map.on(L.Draw.Event.CREATED, function (event) {
       var layer = event.layer;
 
@@ -50,7 +64,7 @@ function Map() {
 
   return (
     <div>
-      <div id="map" style={{ height: "100vh" }}></div>
+      <div id="map" className="flex-grow" style={{ height: "100vh" }}></div>
     </div>
   );
 }
