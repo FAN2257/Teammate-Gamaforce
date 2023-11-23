@@ -8,7 +8,9 @@ function App() {
     <div className='flex flex-col bg-blue-950 h-screen'>
       <Header />
       <div className='flex flex-row bg-white'>
-        <Sidebar />
+        <div>
+          <Sidebar />
+        </div>
         <div className='flex-grow'>
           <Map />
         </div>
